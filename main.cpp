@@ -1,6 +1,6 @@
 /* 
  * File:   main.cpp
- * Author: mlameyer <mlameyer@mgex.com>
+ * Author: mlameyer <hu2824uo@metrostate.com>
  *
  * Created on October 30, 2015, 10:34 AM
  */
