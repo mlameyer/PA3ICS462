@@ -5,33 +5,65 @@
  * Created on October 30, 2015, 10:34 AM
  */
 
-#include <cstdlib>
+#include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
-unsigned char *mySpace;
-int MINIMUM_ALLOC = 4;
-int NUM_ALLOCS = 32000;
-int MEMORYALLOCATED;
-
+#define MINIMUM_ALLOC 0x01
+#define NUM_ALLOCS 0x07f
 
 using namespace std;
 
 /*
  * 
  */
-void hexDump (char *desc, void *addr, int len) ;
+unsigned char mySpace[MINIMUM_ALLOC * NUM_ALLOCS];
 
+void hexDump (char *desc, void *addr, int len) ;
 
 unsigned char *myMalloc(int size)
 {
-/* your code goes here */
- return NULL;  /* replace this */
+    //printf("value of size = %i\n", size);
+    int continueWhile = 1;
+    int i = 0;
+    int block = size + 1;
+    unsigned char value;
+    unsigned char *ptr;
+    
+    ptr = &mySpace[i];
+    
+    while(continueWhile == 1)
+    {
+        value = mySpace[i];
+        //printf("value of value = %i\n", value);
+        if(value > '\x0f')
+        {
+           mySpace[i] = block;
+           ptr = &mySpace[i];
+           i = i + block;
+           mySpace[i] = 255 - i;
+           continueWhile = 0;
+        }
+        else
+        {
+            i = i + (int)value;
+            //printf("value of i = %i\n", i);
+        }
+    }
+    
+    return ptr;
+   
 }
 
 
 void myFree(unsigned char *buffer)
 {
-/* your code goes here */
+    //printf("Value of *buffer variable: %d\n", *buffer );
+    unsigned char value;
+    
+    value = *buffer;
+    //printf("Value of value variable: %i\n", value );
+    *buffer = '\x80' + value;
 }
 
 /* space is a pointer to space you have allocated 
@@ -45,26 +77,64 @@ unsigned char space[size * count];
 
 void init(unsigned char *space, int size, int count)
 {
-    printf("%p \n", space);
-    printf("%p \n", mySpace);
-    mySpace = &space[size * count];
-    printf("%p \n", space);
-    printf("%p \n", mySpace);
-/* your code goes here */
+    printf("Initializing %i memory\n", count);
+    space[size * count];
+    for (int i = 0; i < size * count; i++ ) 
+    {
+        if(i == 0)
+        {
+            space[i] = '\xff';
+        }
+        else
+        {
+           space[ i ] = '\xaa';
+        } 
+    }
+/*    
+    for (int j = 0; j < size * count; j++ ) 
+    {
+      printf("Element[%d] = %d\n", j, space[j] );
+    }
+*/
 }
  
 /* this should return how much space is allocated, in bytes not blocks */
 int totalAllocated() 
 {
-  /* your code goes here */
-    printf("Initializing %u memory \n", mySpace);
+    unsigned char value;
+    int allocatedBytes = 0;
+    
+    for(int i = 0; i < MINIMUM_ALLOC * NUM_ALLOCS; i++)
+    {
+        value = mySpace[i];
+        int k = value >> 4;
+        //printf("Value of value: %x\n", k );
+        if(k == '\x0')
+        {
+           allocatedBytes = allocatedBytes + value; 
+        }
+    }
+    
+    return allocatedBytes;
 }
 
 /* this should return how much space is free, in bytes not blocks */
 int  totalFree() 
 {
- /* your code goes here */
- return 0;  /* replace this */
+    unsigned char value;
+    int freeBytes = 0;
+    
+    for(int i = 0; i < MINIMUM_ALLOC * NUM_ALLOCS; i++)
+    {
+        value = mySpace[i];
+        int k = value >> 4;
+        if(k == '\x0')
+        {
+           freeBytes = freeBytes + value; 
+        }
+    }
+    
+    return NUM_ALLOCS - freeBytes;
 }
 
 /* this routine should return the largest buffer available */
@@ -92,6 +162,8 @@ int main(int argc, char * argv[])
     printf("Init \n");
 
     init(mySpace, MINIMUM_ALLOC, NUM_ALLOCS);
+    //printf("Address stored in mySpace variable: %x\n", mySpace );
+    //printf("Value of *mySpace variable: %d\n", *mySpace );
 
     hexDump ("my buf",mySpace, 0x20 );
   
@@ -109,7 +181,7 @@ int main(int argc, char * argv[])
 
     printf("Total allocated %d \n", totalAllocated() * MINIMUM_ALLOC);
 
-    printf("Total free %d \n", totalFree() *MINIMUM_ALLOC);
+    printf("Total free %d \n", totalFree() * MINIMUM_ALLOC);
 
     myFree(ptr);
 
@@ -121,7 +193,7 @@ int main(int argc, char * argv[])
 
     printf("Total allocated %d \n", totalAllocated() * MINIMUM_ALLOC);
 
-    printf("Total free %d \n", totalFree() *MINIMUM_ALLOC);
+    printf("Total free %d \n", totalFree() * MINIMUM_ALLOC);
 
     hexDump ("my buf",mySpace, 0x20 );
     
