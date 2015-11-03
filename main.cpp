@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define MINIMUM_ALLOC 0x01
+#define MINIMUM_ALLOC 0x02
 #define NUM_ALLOCS 0x07f
 
 using namespace std;
@@ -26,7 +26,7 @@ unsigned char *myMalloc(int size)
     //printf("value of size = %i\n", size);
     int continueWhile = 1;
     int i = 0;
-    int block = size + 1;
+    int block = size + MINIMUM_ALLOC;
     unsigned char value;
     unsigned char *ptr;
     
