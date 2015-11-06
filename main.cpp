@@ -315,6 +315,8 @@ int main(int argc, char * argv[])
 
     hexDump ("my buf",mySpace, 0x40 );
     
+    getchar();
+    
 }
 
 
